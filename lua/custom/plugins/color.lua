@@ -6,12 +6,12 @@ return { -- You can easily change to a different colorscheme.
   'catppuccin/nvim',
   name = 'catppuccin',
   priority = 1000,
-  opts = {    
-      transparent_background = true,
-      default_integrations = true,
-      background = {
-        light = 'latte',
-        dark = 'mocha',
-      },
+  opts = {
+    transparent_background = true,
+    default_integrations = true,
+    background = {
+      light = 'latte',
+      dark = 'mocha',
+    },
   },
 }
