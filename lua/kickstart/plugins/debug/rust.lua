@@ -32,7 +32,7 @@ function M.setup(dap)
     type = 'server',
     port = '${port}',
     executable = {
-      command = find_codelldb_path(),
+      command = codelldb_path,
       args = { '--port', '${port}' },
     },
   }
