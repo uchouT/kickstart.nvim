@@ -875,14 +875,47 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      local function get_lsp_context()
+        local has_navic, navic = pcall(require, 'nvim-navic')
+        if has_navic and navic.is_available() then
+          local location = navic.get_location()
+          location = vim.trim(location)
+          if location ~= '' then
+            return location
+          end
+        end
+        return ''
+      end
 
-      -- You can configure sections in the statusline by overriding their
+      local statusline = require 'mini.statusline'
+      statusline.setup {
+        content = {
+          active = function()
+            local mode, mode_hl = statusline.section_mode { strings = { type = 'short' } }
+            local git = statusline.section_git { strings = { signs = { add = '+', change = '~', delete = '-' } } }
+            local diff = statusline.section_diff {}
+            local diagnostics = statusline.section_diagnostics {}
+
+            local filename = vim.fn.expand '%:.'
+
+            local fileinfo = statusline.section_fileinfo {}
+            local location = statusline.section_location {}
+            local lsp_context = get_lsp_context()
+
+            return statusline.combine_groups {
+              { hl = mode_hl, strings = { mode } },
+              { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics } },
+              '%<',
+              { hl = 'MiniStatuslineFilename', strings = { filename } },
+              { hl = 'Comment', strings = { lsp_context } },
+
+              '%=',
+              { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+              { hl = mode_hl, strings = { location } },
+            }
+          end,
+        },
+      } -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for
       -- cursor location to LINE:COLUMN
       ---@diagnostic disable-next-line: duplicate-set-field
